@@ -29,9 +29,7 @@ export class AuthControllers {
       const user = await User.findById(_id);
 
       if (!user) {
-        res
-          .status(404)
-          .json({ message: "There is no user with this ID" });
+        res.status(404).json({ message: "There is no user with this ID" });
       }
 
       return res.status(200).json(user);
@@ -100,10 +98,15 @@ export class AuthControllers {
     try {
       const { email, password } = req.body;
       const user = await User.login(email, password);
+
       const token = createToken(user._id);
+
       user.password = "";
 
-      return res.json({ ...user, token });
+      return res.json({
+        data: user,
+        token,
+      });
     } catch (err) {
       return ValidateToken.catchTokenErrors(res, err as Error);
     }
