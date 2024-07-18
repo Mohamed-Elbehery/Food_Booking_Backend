@@ -4,7 +4,7 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import { dbInstance } from "../lib/db";
 import { menuRouter } from "../routes/menu.routes";
-import { bookingsRouter } from "../routes/bookings.routes";
+import { bookingRouter } from "../routes/booking.routes";
 import { authRouter } from "../routes/auth.routes";
 
 dotenv.config();
@@ -21,5 +21,5 @@ dbInstance.connect();
 app.use(morgan("dev"));
 
 app.use("/menu", menuRouter);
-app.use("/bookings", bookingsRouter);
+app.use("/bookings", bookingRouter);
 app.use("/auth", authRouter);

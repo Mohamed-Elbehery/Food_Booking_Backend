@@ -1,30 +1,39 @@
 import { type Request, type Response } from "express";
 import Booking from "../models/booking.model";
+import { ValidateToken } from "../utils/validateToken";
 
 export class BookingControllers {
   public constructor() {}
 
-  public async getBookings(_: Request, res: Response) {
+  public async getBookings(req: Request, res: Response) {
     try {
+      await ValidateToken.validateToken(req);
+
       const result = await Booking.find({});
 
-      res.status(200).json({ data: result });
+      res.status(200).json(result);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Internal Server Error" });
+      return ValidateToken.catchTokenErrors(res, err as Error);
     }
   }
 
   public async getBookingByID(req: Request, res: Response) {
     try {
+      await ValidateToken.validateToken(req);
+
       const { _id } = req.query;
 
-      const result = await Booking.findById(_id);
+      const booking = await Booking.findById(_id);
 
-      res.status(200).json({ data: result });
+      if (!booking) {
+        res
+          .status(404)
+          .json({ message: "There is no booking with this ID" });
+      }
+
+      res.status(200).json(booking);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Internal Server Error" });
+      return ValidateToken.catchTokenErrors(res, err as Error);
     }
   }
 
@@ -32,23 +41,23 @@ export class BookingControllers {
     try {
       const result = await Booking.create(req.body);
 
-      res.status(200).json({ data: result });
+      res.status(200).json(result);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(400).json({ message: "Bad Request!" });
     }
   }
 
   public async changeBookingStatus(req: Request, res: Response) {
     try {
+      await ValidateToken.validateToken(req);
+
       const { _id } = req.query;
 
-      const result = await Booking.updateOne({ _id }, req.body);
+      const result = await Booking.updateOne({ _id }, { status: "accepted" });
 
-      res.status(200).json({ data: result });
+      res.status(200).json(result);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Internal Server Error" });
+      return ValidateToken.catchTokenErrors(res, err as Error);
     }
   }
 }

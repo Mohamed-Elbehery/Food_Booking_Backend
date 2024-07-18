@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { app } from "../src";
-
+import swaggerDocs from "../utils/swagger";
 dotenv.config();
 
 const URI: string = process.env.DB_URI!;
@@ -25,6 +25,8 @@ class Database {
 
       app.listen(PORT, () => {
         console.log(`Server is running on port http://localhost:${PORT}`);
+
+        swaggerDocs(app);
       });
     } catch (e) {
       console.error("Failed to Connect to Database", e);
