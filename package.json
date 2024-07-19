@@ -11,6 +11,9 @@
     "predev": "npm run build",
     "dev": "concurrently \"npx tsc -w\"  \"nodemon dist/src/index.js\""
   },
+  "engines": {
+    "node": "20.11.1"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
