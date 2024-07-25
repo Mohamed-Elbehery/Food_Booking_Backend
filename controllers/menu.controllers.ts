@@ -1,6 +1,7 @@
 import { type Request, type Response } from "express";
 import MenuItem from "../models/menu.model";
 import { ValidateToken } from "../utils/validateToken";
+import { cloudinaryConfig } from "../utils/cloudinary";
 
 export class MenuControllers {
   public constructor() {}
@@ -36,7 +37,16 @@ export class MenuControllers {
       const adminId = await ValidateToken.validateToken(req);
       if(!adminId) return;
 
-      const result = await MenuItem.create(req.body);
+      const uploadedResponse = await cloudinaryConfig.uploader.upload(
+        req.body.item_photo,
+        {
+          upload_preset: "food_booking",
+        }
+      );
+
+      console.log(uploadedResponse);
+
+      const result = await MenuItem.create({...req.body, item_photo: uploadedResponse});
 
       res.status(201).json(result);
     } catch (err) {
