@@ -51,8 +51,8 @@ Welcome to the Food Restaurant API! This API is designed to manage restaurant op
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/food-restaurant-api.git
-    cd food-restaurant-api
+    git clone https://github.com/Mohamed-Elbehery/Food_Booking_Backend.git
+    cd Food_Booking_Backend
     ```
 
 2. Install dependencies:
@@ -107,12 +107,11 @@ Create a `.env` file in the root directory and add the following variables:
 
 ```
 PORT=3000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
+DB_URI=your_mongodb_connection_string
+JWT_SECRET_KEY=your_jwt_secret
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-OPENAI_API_KEY=your_openai_api_key
 ```
 
 ## Folder Structure
@@ -120,19 +119,30 @@ OPENAI_API_KEY=your_openai_api_key
 ```
 .
 ├── src
-│   ├── controllers
-│   ├── interfaces
-│   ├── middlewares
-│   ├── models
-│   ├── routes
-│   ├── services
-│   ├── utils
-│   ├── app.ts
-│   ├── server.ts
-├── tests
+│   ├── index.ts
+├── controllers
+│   ├── auth.controllers.ts
+│   ├── booking.controllers.ts
+│   ├── menu.controllers.ts
+├── models
+│   ├── auth.model.ts
+│   ├── booking.model.ts
+│   ├── menu.model.ts
+├── routes
+│   ├── auth.routes.ts
+│   ├── booking.routes.ts
+│   ├── menu.routes.ts
+├── utils
+│   ├── cloudinary.ts
+│   ├── swagger.ts
+│   ├── validateToken.ts
+├── lib
+│   ├── createToken.ts
+│   ├── db.ts
 ├── .env
 ├── .gitignore
 ├── package.json
+├── package-lock.json
 ├── tsconfig.json
 └── README.md
 ```
