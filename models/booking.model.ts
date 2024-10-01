@@ -26,7 +26,7 @@ const BookingSchema = new Schema({
     default: "pending",
   },
   time: {
-    type: Date,
+    type: String,
     required: true,
   },
   updatedAt: {
