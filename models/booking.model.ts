@@ -8,12 +8,12 @@ const BookingSchema = new Schema({
     required: true,
   },
   choosen_date: {
-    type: Date,
+    type: String,
     required: true,
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    required: true,
   },
   phone_number: {
     type: String,
@@ -21,7 +21,7 @@ const BookingSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["accepted","pending", "rejected"],
+    enum: ["accepted", "pending", "rejected"],
     required: true,
     default: "pending",
   },
@@ -39,6 +39,7 @@ const BookingSchema = new Schema({
   },
 });
 
-const Booking = mongoose.models.Booking || mongoose.model("Booking", BookingSchema);
+const Booking =
+  mongoose.models.Booking || mongoose.model("Booking", BookingSchema);
 
 export default Booking;
