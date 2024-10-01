@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const BookingSchema = new Schema({
   total_person: {
-    type: Number,
+    type: String,
     required: true,
   },
   choosen_date: {
