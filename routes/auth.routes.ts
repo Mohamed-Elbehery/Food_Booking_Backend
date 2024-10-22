@@ -8,7 +8,10 @@ export const authRouter = express.Router();
  *  get:
  *    tags:
  *      - Auth
- *    description: Get all users
+ *    summary: Get all users
+ *    description: Retrieve a list of all users. Requires authentication.
+ *    security:
+ *      - bearerAuth: []
  *    responses:
  *      200:
  *        description: A list of users
@@ -17,27 +20,9 @@ export const authRouter = express.Router();
  *            schema:
  *              type: array
  *              items:
- *                type: object
- *                properties:
- *                  _id:
- *                    type: string
- *                  email:
- *                    type: string
- *                    format: email
- *                  name:
- *                    type: string
- *                  bookings:
- *                    type: string
- *                  profile_img:
- *                    type: string
- *                  phone_number:
- *                    type: string
- *                  role:
- *                    type: string
- *                    enum: ["normal", "admin"]
- *                    default: "normal"
+ *                $ref: '#/components/schemas/User'
  *      401:
- *        description: Unauthorized
+ *        $ref: '#/components/responses/UnauthorizedError'
  */
 authRouter.get("/get-all-users", authControllers.getAllUsers);
 
@@ -47,7 +32,10 @@ authRouter.get("/get-all-users", authControllers.getAllUsers);
  *  get:
  *    tags:
  *      - Auth
- *    description: Get user by ID
+ *    summary: Get user by ID
+ *    description: Retrieve a user by their ID. Requires authentication.
+ *    security:
+ *      - bearerAuth: []
  *    parameters:
  *      - name: _id
  *        in: query
@@ -61,27 +49,9 @@ authRouter.get("/get-all-users", authControllers.getAllUsers);
  *        content:
  *          application/json:
  *            schema:
- *              type: object
- *              properties:
- *                _id:
- *                  type: string
- *                email:
- *                  type: string
- *                  format: email
- *                name:
- *                  type: string
- *                bookings:
- *                  type: string
- *                profile_img:
- *                  type: string
- *                phone_number:
- *                  type: string
- *                role:
- *                  type: string
- *                  enum: ["normal", "admin"]
- *                  default: "normal"
+ *              $ref: '#/components/schemas/User'
  *      401:
- *        description: Unauthorized
+ *        $ref: '#/components/responses/UnauthorizedError'
  *      404:
  *        description: User not found
  */
@@ -93,13 +63,20 @@ authRouter.get("/get-user", authControllers.getUserById);
  *  post:
  *    tags:
  *      - Auth
- *    description: Register a new user
+ *    summary: Register a new user
+ *    description: Create a new user account
  *    requestBody:
  *      required: true
  *      content:
  *        application/json:
  *          schema:
  *            type: object
+ *            required:
+ *              - name
+ *              - email
+ *              - password
+ *              - profile_img
+ *              - phone_number
  *            properties:
  *              name:
  *                type: string
@@ -108,16 +85,12 @@ authRouter.get("/get-user", authControllers.getUserById);
  *                format: email
  *              password:
  *                type: string
+ *                format: password
  *              profile_img:
  *                type: string
+ *                format: binary
  *              phone_number:
  *                type: string
- *            required:
- *              - name
- *              - email
- *              - password
- *              - profile_img
- *              - phone_number
  *    responses:
  *      201:
  *        description: User registered successfully
@@ -127,25 +100,7 @@ authRouter.get("/get-user", authControllers.getUserById);
  *              type: object
  *              properties:
  *                data:
- *                  type: object
- *                  properties:
- *                    _id:
- *                      type: string
- *                    email:
- *                      type: string
- *                      format: email
- *                    name:
- *                      type: string
- *                    bookings:
- *                      type: string
- *                    profile_img:
- *                      type: string
- *                    phone_number:
- *                      type: string
- *                    role:
- *                      type: string
- *                      enum: ["normal", "admin"]
- *                      default: "normal"
+ *                  $ref: '#/components/schemas/User'
  *                token:
  *                  type: string
  *      400:
@@ -159,13 +114,22 @@ authRouter.post("/register", authControllers.register);
  *  post:
  *    tags:
  *      - Auth
- *    description: Register a new admin
+ *    summary: Register a new admin
+ *    description: Create a new admin account. Requires authentication with admin privileges.
+ *    security:
+ *      - bearerAuth: []
  *    requestBody:
  *      required: true
  *      content:
  *        application/json:
  *          schema:
  *            type: object
+ *            required:
+ *              - name
+ *              - email
+ *              - password
+ *              - profile_img
+ *              - phone_number
  *            properties:
  *              name:
  *                type: string
@@ -174,16 +138,12 @@ authRouter.post("/register", authControllers.register);
  *                format: email
  *              password:
  *                type: string
+ *                format: password
  *              profile_img:
  *                type: string
+ *                format: binary
  *              phone_number:
  *                type: string
- *            required:
- *              - name
- *              - email
- *              - password
- *              - profile_img
- *              - phone_number
  *    responses:
  *      201:
  *        description: Admin registered successfully
@@ -193,31 +153,13 @@ authRouter.post("/register", authControllers.register);
  *              type: object
  *              properties:
  *                data:
- *                  type: object
- *                  properties:
- *                    _id:
- *                      type: string
- *                    email:
- *                      type: string
- *                      format: email
- *                    name:
- *                      type: string
- *                    bookings:
- *                      type: string
- *                    profile_img:
- *                      type: string
- *                    phone_number:
- *                      type: string
- *                    role:
- *                      type: string
- *                      enum: ["normal", "admin"]
- *                      default: "normal"
+ *                  $ref: '#/components/schemas/User'
  *                token:
  *                  type: string
- *      401:
- *        description: Unauthorized
  *      400:
  *        description: Bad request
+ *      401:
+ *        $ref: '#/components/responses/UnauthorizedError'
  */
 authRouter.post("/admin-register", authControllers.adminRegister);
 
@@ -227,22 +169,24 @@ authRouter.post("/admin-register", authControllers.adminRegister);
  *  post:
  *    tags:
  *      - Auth
- *    description: Log in a user
+ *    summary: Log in a user
+ *    description: Authenticate a user and return a token
  *    requestBody:
  *      required: true
  *      content:
  *        application/json:
  *          schema:
  *            type: object
+ *            required:
+ *              - email
+ *              - password
  *            properties:
  *              email:
  *                type: string
  *                format: email
  *              password:
  *                type: string
- *            required:
- *              - email
- *              - password
+ *                format: password
  *    responses:
  *      200:
  *        description: User logged in successfully
@@ -252,31 +196,13 @@ authRouter.post("/admin-register", authControllers.adminRegister);
  *              type: object
  *              properties:
  *                data:
- *                  type: object
- *                  properties:
- *                    _id:
- *                      type: string
- *                    email:
- *                      type: string
- *                      format: email
- *                    name:
- *                      type: string
- *                    bookings:
- *                      type: string
- *                    profile_img:
- *                      type: string
- *                    phone_number:
- *                      type: string
- *                    role:
- *                      type: string
- *                      enum: ["normal", "admin"]
- *                      default: "normal"
+ *                  $ref: '#/components/schemas/User'
  *                token:
  *                  type: string
  *      400:
  *        description: Bad request
  *      401:
- *        description: Unauthorized
+ *        description: Incorrect email or password
  */
 authRouter.post("/login", authControllers.login);
 
@@ -286,22 +212,24 @@ authRouter.post("/login", authControllers.login);
  *  patch:
  *    tags:
  *      - Auth
- *    description: Change a user's role
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              _id:
- *                type: string
- *              role:
- *                type: string
- *                enum: ["normal", "admin"]
- *            required:
- *              - _id
- *              - role
+ *    summary: Change a user's role
+ *    description: Change the role of a user. Requires authentication with admin privileges.
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - name: _id
+ *        in: query
+ *        required: true
+ *        schema:
+ *          type: string
+ *        description: The ID of the user whose role is to be changed
+ *      - name: role
+ *        in: query
+ *        required: true
+ *        schema:
+ *          type: string
+ *          enum: [normal, admin]
+ *        description: The new role for the user
  *    responses:
  *      200:
  *        description: User role updated successfully
@@ -310,33 +238,54 @@ authRouter.post("/login", authControllers.login);
  *            schema:
  *              type: object
  *              properties:
- *                data:
- *                  type: object
- *                  properties:
- *                    _id:
- *                      type: string
- *                    email:
- *                      type: string
- *                      format: email
- *                    name:
- *                      type: string
- *                    bookings:
- *                      type: string
- *                    profile_img:
- *                      type: string
- *                    phone_number:
- *                      type: string
- *                    role:
- *                      type: string
- *                      enum: ["normal", "admin"]
- *                      default: "normal"
- *                message:
+ *                acknowledged:
+ *                  type: boolean
+ *                modifiedCount:
+ *                  type: number
+ *                upsertedId:
  *                  type: string
+ *                upsertedCount:
+ *                  type: number
+ *                matchedCount:
+ *                  type: number
  *      400:
  *        description: Bad request
  *      401:
- *        description: Unauthorized
- *      403:
- *        description: Forbidden
+ *        $ref: '#/components/responses/UnauthorizedError'
  */
 authRouter.patch("/change-role", authControllers.changeRole);
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         email:
+ *           type: string
+ *           format: email
+ *         name:
+ *           type: string
+ *         bookings:
+ *           type: string
+ *           description: ID of associated booking
+ *         profile_img:
+ *           type: string
+ *         phone_number:
+ *           type: string
+ *         role:
+ *           type: string
+ *           enum: [normal, admin]
+ *           default: normal
+ *   responses:
+ *     UnauthorizedError:
+ *       description: Access token is missing or invalid
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */

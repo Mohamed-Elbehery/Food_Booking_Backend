@@ -8,20 +8,28 @@ export const menuRouter = express.Router();
  *  get:
  *    tags:
  *      - Menu
- *    description: Will return a json of the items we serve in the menu
+ *    summary: Get all menu items
+ *    description: Retrieve a list of all items in the menu
  *    responses:
  *      200:
- *        description: List of items we serve in the menu
+ *        description: List of menu items
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/MenuItem'
  */
 menuRouter.get("/get-menu", menuControllers.getMenuItems);
 
 /**
  * @openapi
- * /menu/get-menu-item?_id=1234:
+ * /menu/get-menu-item:
  *  get:
  *    tags:
  *      - Menu
- *    description: Will return a json of the item we serve in the menu by ID
+ *    summary: Get menu item by ID
+ *    description: Retrieve a specific menu item by its ID
  *    parameters:
  *      - in: query
  *        name: _id
@@ -32,6 +40,12 @@ menuRouter.get("/get-menu", menuControllers.getMenuItems);
  *    responses:
  *      200:
  *        description: A single menu item
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/MenuItem'
+ *      404:
+ *        description: Menu item not found
  */
 menuRouter.get("/get-menu-item", menuControllers.getMenuItemByID);
 
@@ -41,23 +55,27 @@ menuRouter.get("/get-menu-item", menuControllers.getMenuItemByID);
  *  post:
  *    tags:
  *      - Menu
- *    description: Adds a new menu item
+ *    summary: Add a new menu item
+ *    description: Add a new item to the menu. Requires admin authentication.
+ *    security:
+ *      - bearerAuth: []
  *    requestBody:
  *      required: true
  *      content:
  *        application/json:
  *          schema:
- *            type: object
- *            properties:
- *              name:
- *                type: string
- *              price:
- *                type: number
- *              description:
- *                type: string
+ *            $ref: '#/components/schemas/MenuItemInput'
  *    responses:
  *      201:
- *        description: Menu item added
+ *        description: Menu item added successfully
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/MenuItem'
+ *      400:
+ *        description: Bad request
+ *      401:
+ *        $ref: '#/components/responses/UnauthorizedError'
  */
 menuRouter.post("/add-menu-item", menuControllers.addMenuItem);
 
@@ -67,35 +85,60 @@ menuRouter.post("/add-menu-item", menuControllers.addMenuItem);
  *  patch:
  *    tags:
  *      - Menu
- *    description: Updates a menu item
+ *    summary: Update a menu item
+ *    description: Update an existing menu item. Requires admin authentication.
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: query
+ *        name: _id
+ *        required: true
+ *        schema:
+ *          type: string
+ *        description: The ID of the menu item to update
  *    requestBody:
  *      required: true
  *      content:
  *        application/json:
  *          schema:
- *            type: object
- *            properties:
- *              id:
- *                type: string
- *              name:
- *                type: string
- *              price:
- *                type: number
- *              description:
- *                type: string
+ *            $ref: '#/components/schemas/MenuItemInput'
  *    responses:
  *      200:
- *        description: Menu item updated
+ *        description: Menu item updated successfully
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                acknowledged:
+ *                  type: boolean
+ *                modifiedCount:
+ *                  type: number
+ *                upsertedId:
+ *                  type: string
+ *                upsertedCount:
+ *                  type: number
+ *                matchedCount:
+ *                  type: number
+ *      400:
+ *        description: Bad request
+ *      401:
+ *        $ref: '#/components/responses/UnauthorizedError'
+ *      404:
+ *        description: Menu item not found
  */
 menuRouter.patch("/update-menu-item", menuControllers.updateMenuItem);
 
 /**
  * @openapi
- * /menu/delete-menu-item?_id=1234:
+ * /menu/delete-menu-item:
  *  delete:
  *    tags:
  *      - Menu
- *    description: Deletes a menu item
+ *    summary: Delete a menu item
+ *    description: Delete a menu item by its ID. Requires admin authentication.
+ *    security:
+ *      - bearerAuth: []
  *    parameters:
  *      - in: query
  *        name: _id
@@ -105,6 +148,65 @@ menuRouter.patch("/update-menu-item", menuControllers.updateMenuItem);
  *        description: The ID of the menu item to delete
  *    responses:
  *      200:
- *        description: Menu item deleted
+ *        description: Menu item deleted successfully
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                acknowledged:
+ *                  type: boolean
+ *                deletedCount:
+ *                  type: number
+ *      401:
+ *        $ref: '#/components/responses/UnauthorizedError'
+ *      404:
+ *        description: Menu item not found
  */
 menuRouter.delete("/delete-menu-item", menuControllers.deleteMenuItem);
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     MenuItem:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         item_photo:
+ *           type: string
+ *         price:
+ *           type: number
+ *         title:
+ *           type: string
+ *         ingredients:
+ *           type: array
+ *           items:
+ *             type: string
+ *         category:
+ *           type: string
+ *           enum: [Breakfast, "Main Dishes", Drinks, Desserts]
+ *     MenuItemInput:
+ *       type: object
+ *       required:
+ *         - item_photo
+ *         - price
+ *         - title
+ *         - ingredients
+ *         - category
+ *       properties:
+ *         item_photo:
+ *           type: string
+ *         price:
+ *           type: number
+ *         title:
+ *           type: string
+ *         ingredients:
+ *           type: array
+ *           items:
+ *             type: string
+ *         category:
+ *           type: string
+ *           enum: [Breakfast, "Main Dishes", Drinks, Desserts]
+ */

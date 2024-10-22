@@ -1,44 +1,23 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const Schema = mongoose.Schema;
+export interface IBooking extends Document {
+  name: string;
+  email: string;
+  date: Date;
+  time: string;
+  guests: number;
+  tableId: number;
+  status: "pending" | "accepted" | "rejected";
+}
 
-const BookingSchema = new Schema({
-  total_person: {
-    type: Number,
-    required: true,
-  },
-  choosen_date: {
-    type: Date,
-    required: true,
-  },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-  phone_number: {
-    type: String,
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ["accepted","pending", "rejected"],
-    required: true,
-    default: "pending",
-  },
-  time: {
-    type: Date,
-    required: true,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+const BookingSchema: Schema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  date: { type: Date, required: true },
+  time: { type: String, required: true },
+  guests: { type: Number, required: true },
+  tableId: { type: Number, required: true, min: 1, max: 6 },
+  status: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending" },
 });
 
-const Booking = mongoose.models.Booking || mongoose.model("Booking", BookingSchema);
-
-export default Booking;
+export default mongoose.model<IBooking>("Booking", BookingSchema);
